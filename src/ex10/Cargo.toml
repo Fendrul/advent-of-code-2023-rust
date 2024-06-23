@@ -1,0 +1,10 @@
+[package]
+name = "ex10"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+file_reader = { path = "../utils/file_reader" }
+rayon = "1.10.0"
+pest = "2.7.10"
+pest_derive = "2.7.10"

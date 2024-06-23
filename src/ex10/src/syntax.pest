@@ -1,0 +1,19 @@
+WHITESPACE = _{ " " | "\t" }
+
+// Game
+game = { SOI ~ line ~ ("\r\n" ~ line)* ~ "\r\n"* ~ EOI } 
+
+// Line
+line = { cell+ }
+
+// Tokens
+empty = { "." }
+animal = { ^"s" }
+TL = { "F" }
+TR = { "7" }
+BL = { "L" }
+BR = { "J" }
+horizontal = { "-" }
+vertical = { "|" }
+
+cell = _{ empty | TR | TL | BL | BR | horizontal | vertical | animal }

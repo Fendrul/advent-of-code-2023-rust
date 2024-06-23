@@ -4,10 +4,18 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/ex11/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/utils/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/ex12/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testtt/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/ex10/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/utils/file_reader/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/flops/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/src/ex11/target" />
-      <excludeFolder url="file://$MODULE_DIR$/src/utils/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ex12/target" />
+      <excludeFolder url="file://$MODULE_DIR$/src/testtt/target" />
+      <excludeFolder url="file://$MODULE_DIR$/src/ex10/target" />
+      <excludeFolder url="file://$MODULE_DIR$/src/utils/file_reader/target" />
+      <excludeFolder url="file://$MODULE_DIR$/src/flops/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
