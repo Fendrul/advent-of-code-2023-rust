@@ -25,7 +25,10 @@ fn main() {
             }
     };
     
-    println!("Farthest point: {}", game_board.get_answers());
+    let answers = game_board.get_answers();
+    
+    println!("Farthest point: {}", answers.0);
+    println!("Number of inner tiles: {}", answers.1);
     
     // println!("{:?}", game_board);
     println!("Execution time: {:?}", timer.elapsed());

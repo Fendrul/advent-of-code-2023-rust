@@ -1,8 +1,7 @@
-use std::fmt::{Debug, Display};
+use std::fmt::{Display};
 use std::hash::Hash;
 
 use Direction::{Down, Left, Right, Up};
-use crate::entities;
 
 use crate::entities::ghost::Direction;
 
@@ -38,8 +37,8 @@ impl Display for GameCellType {
 
 #[derive(Eq, Hash, PartialEq, Clone, Copy)]
 pub struct Coordinates {
-    pub(crate) row: isize,
-    pub(crate) col: isize,
+    pub(crate) row: i32,
+    pub(crate) col: i32,
 }
 
 impl Coordinates {
