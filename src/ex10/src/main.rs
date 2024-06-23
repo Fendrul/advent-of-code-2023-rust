@@ -16,12 +16,12 @@ fn main() {
         Err(error) => panic!("Error while tryign to read the file: {:?}", error)
     };
 
-    let game_board = match parse_stdin(&file_content) {
+    let mut game_board = match parse_stdin(&file_content) {
         Ok(content) => content,
         Err(error) =>
             match error {
-                InvalidFileSyntax => panic!("Invalid file syntax"),
-                InvalidData(error_message) => panic!("Invalid data: {}", error_message)
+                InvalidData(error_message) => panic!("Invalid data: {}", error_message),
+                InvalidFileSyntax(error_message) => panic!("Invalid file syntax: {}", error_message),
             }
     };
     

@@ -7,7 +7,7 @@ pub struct Ghost {
     path: Vec<Coordinates>,
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum Direction {
     Up,
     Down,
@@ -36,8 +36,8 @@ impl Ghost {
         &self.coordinates
     }
 
-    pub fn get_direction(&self) -> Direction {
-        self.direction
+    pub fn get_direction(&self) -> &Direction {
+        &self.direction
     }
     
     pub fn get_path(&self) -> &Vec<Coordinates> {

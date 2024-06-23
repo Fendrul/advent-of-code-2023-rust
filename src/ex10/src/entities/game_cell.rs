@@ -1,12 +1,14 @@
+use std::fmt::{Debug, Display};
 use std::hash::Hash;
 
 use Direction::{Down, Left, Right, Up};
+use crate::entities;
 
 use crate::entities::ghost::Direction;
 
 pub type GameCell = GameCellType;
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(PartialEq, Eq, Hash, Clone)]
 pub enum GameCellType {
     Empty,
     TR,
@@ -15,7 +17,22 @@ pub enum GameCellType {
     BL,
     Horizontal,
     Vertical,
-    Animal,
+    Animal(Option<Box<GameCellType>>),
+}
+
+impl Display for GameCellType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GameCellType::Empty => write!(f, "Empty"),
+            GameCellType::TL => write!(f, "F"),
+            GameCellType::TR => write!(f, "7"),
+            GameCellType::BR => write!(f, "J"),
+            GameCellType::BL => write!(f, "L"),
+            GameCellType::Horizontal => write!(f, "-"),
+            GameCellType::Vertical => write!(f, "|"),
+            GameCellType::Animal(_) => write!(f, "S"),
+        }
+    }
 }
 
 #[derive(Eq, Hash, PartialEq, Clone, Copy)]

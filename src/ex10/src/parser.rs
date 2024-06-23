@@ -17,8 +17,8 @@ pub struct AOCParser();
 pub fn parse_stdin(input: &str) -> Result<GameBoard, ParsingError> {
     let parsed_game = match AOCParser::parse(Rule::game, input) {
         Ok(data) => data,
-        Err(_) => {
-            return Err(InvalidFileSyntax);
+        Err(error) => {
+            return Err(InvalidFileSyntax(error.to_string()));
         }
     }.next().unwrap();
 
@@ -50,12 +50,12 @@ fn parse_cell(cell: Pair<Rule>) -> Result<GameCell, ParsingError> {
         BR => Ok(GameCellType::BR),
         Rule::horizontal => Ok(GameCellType::Horizontal),
         Rule::vertical => Ok(GameCellType::Vertical),
-        Rule::animal => Ok(GameCellType::Animal),
+        Rule::animal => Ok(GameCellType::Animal(None)),
         _ => Err(InvalidData("Expected a cell type, couldn't find one"))
     }
 }
 
 pub enum ParsingError<'a> {
-    InvalidFileSyntax,
+    InvalidFileSyntax(String),
     InvalidData(&'a str),
 }
