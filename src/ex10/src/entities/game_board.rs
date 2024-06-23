@@ -4,12 +4,13 @@ use std::fmt::Debug;
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use Direction::{Down, Left, Right};
-use GameCellType::{BL, BR, Empty, Horizontal, TL, TR, Vertical};
+use GameCellType::{BL, BR, Empty, EmptyAnimal, Horizontal, TL, TR, Vertical};
 
 use crate::entities::game_cell::{Coordinates, GameCell, GameCellType};
 use crate::entities::game_cell::GameCellType::Animal;
 use crate::entities::ghost::{Direction, Ghost};
 use crate::entities::ghost::Direction::Up;
+use crate::entities::perimeter_state;
 use crate::entities::perimeter_state::{PerimeterDirection, PerimeterState};
 use crate::entities::table_vector::TableVector;
 
@@ -26,9 +27,10 @@ impl GameBoard {
             for (col, cell) in line.iter().enumerate() {
                 let row = isize::try_from(row).expect("Row is too big");
                 let col = isize::try_from(col).expect("Col is too big");
-
-                if let Animal(_) = cell {
-                    animal_coordinates = Some(Coordinates { row, col });
+                
+                match cell {
+                    EmptyAnimal | Animal(_) => { animal_coordinates = Some(Coordinates { row, col });}
+                    _ => {}
                 }
             }
         }
@@ -65,7 +67,7 @@ impl GameBoard {
                 let col = isize::try_from(col).expect("Col is too big");
                 
                 if perimeter.contains(&Coordinates {row, col} ) {
-                    Self::determine_perimeter(&mut perimeter_state, cell);
+                    perimeter_state.determine_perimeter(cell);
                 } else if perimeter_state.is_inside_perimeter {
                     cells_inside_perimeter += 1;
                 }
@@ -78,21 +80,21 @@ impl GameBoard {
     }
 
     fn determine_perimeter(perimeter_state: &mut PerimeterState, cell: &GameCell) {
+        if let Animal(animal_type) = cell {
+            Self::determine_perimeter(perimeter_state, animal_type);
+            return;
+        }
+        
         match &perimeter_state.perimeter_direction {
             None => {
                 match cell {
                     Vertical => perimeter_state.toggle_inside_perimeter(),
                     TL => perimeter_state.perimeter_direction = Some(PerimeterDirection::Down),
-                    BL => perimeter_state.perimeter_direction = Some(PerimeterDirection::Up),
-                    Animal(animal_type) => {
-                        match animal_type {
-                            Some(cell_type) => Self::determine_perimeter(perimeter_state, cell_type),
-                            _ => panic!("Animal type is not set")
-                        }
-                    }
-                    _ => {}
+                    BL => perimeter_state.perimeter_direction = Some(PerimeterDirection::Up),     
+                    _ => unreachable!("Invalid cell type when no direction is set")
                 }
             }
+            
             Some(direction) => {
                 match (direction, cell) {
                     (PerimeterDirection::Down, BR) | (PerimeterDirection::Up, TR) => perimeter_state.toggle_inside_perimeter(),
@@ -101,21 +103,15 @@ impl GameBoard {
                 
                 match cell {
                     TR | BR => perimeter_state.perimeter_direction = None,
-                    Animal(animal_type) => {
-                        match animal_type {
-                            Some(cell_type) => Self::determine_perimeter(perimeter_state, cell_type),
-                            _ => panic!("Animal type is not set")
-                        }
-                    }
-                    TL | BL | Vertical | Empty => panic!("Incorrect cell type when a direction for the perimeter is set at cell {}", cell),
-                    _ => {}
+                    Horizontal => {}
+                    TL | BL | Vertical | Empty | EmptyAnimal | Animal(_) => unreachable!("Invalid cell type when a direction for the perimeter is set at cell {}", cell),
                 }
             }
         }
     }
 
     fn determine_animal_type(&mut self, ghosts: &[Ghost]) {
-        let animal_cell = self.get_mut_cell_from_coordinates(self.animal_coordinates)
+        let mut animal_cell = self.get_mut_cell_from_coordinates(self.animal_coordinates)
             .expect("Couldn't extract cell from animal cell coordinates");
 
         let mut directions: Vec<&Direction>  = ghosts.iter()
@@ -123,32 +119,27 @@ impl GameBoard {
             .collect();
 
         directions.sort();
-
-        match animal_cell {
-            Animal(ref mut animal_type) => {
-                if animal_type.is_some() { panic!("The animal type is already set") }
-
-                let new_animal_type = match directions.as_slice() {
-                    [Up, Right] => BL,
-                    [Up, Left] => BR,
-                    [Up, Down] => Vertical,
-                    [Left, Right] => Horizontal,
-                    [Down, Right] => TL,
-                    [Down, Left] => TR,
-                    _ => panic!("Invalid directions when trying to determine animal type")
-                };
-
-                *animal_type = Some(Box::new(new_animal_type));
-            }
-            _ => panic!("The cell cordoninates for the animal doesn't contain an animal")
-        }
+        
+        let underneath_animal_type = match directions.as_slice() {
+            [Up, Right] => BL,
+            [Up, Left] => BR,
+            [Up, Down] => Vertical,
+            [Left, Right] => Horizontal,
+            [Down, Right] => TL,
+            [Down, Left] => TR,
+            _ => panic!("Invalid directions when trying to determine animal type")
+        };
+        
+        *animal_cell = Animal(Box::new(underneath_animal_type));
     }
 
     fn explore_board(&self, ghosts: Vec<Ghost>) -> Option<Ghost> {
         ghosts.into_par_iter()
             .find_map_first(|ghost| {
                 let mut current_ghost = ghost;
+                
                 while let Some(new_ghost) = self.move_ghost(current_ghost) {
+                    
                     if let Animal(_) = self.get_cell_from_coordinates(new_ghost.get_coordinates())
                         .expect("Couldn't extract cell from the new ghost")
                     {
@@ -216,7 +207,7 @@ impl Debug for GameBoard {
                     BL => write!(f, "J"),
                     Horizontal => write!(f, "|"),
                     Vertical => write!(f, "-"),
-                    Animal(_) => write!(f, "S")
+                    Animal(_) | EmptyAnimal => write!(f, "S")
                 };
             }
             let _ = writeln!(f);

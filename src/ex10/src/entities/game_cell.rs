@@ -17,7 +17,8 @@ pub enum GameCellType {
     BL,
     Horizontal,
     Vertical,
-    Animal(Option<Box<GameCellType>>),
+    EmptyAnimal,
+    Animal(Box<GameCellType>),
 }
 
 impl Display for GameCellType {
@@ -30,7 +31,7 @@ impl Display for GameCellType {
             GameCellType::BL => write!(f, "L"),
             GameCellType::Horizontal => write!(f, "-"),
             GameCellType::Vertical => write!(f, "|"),
-            GameCellType::Animal(_) => write!(f, "S"),
+            GameCellType::Animal(_) | GameCellType::EmptyAnimal => write!(f, "S"),
         }
     }
 }

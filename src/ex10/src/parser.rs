@@ -50,7 +50,7 @@ fn parse_cell(cell: Pair<Rule>) -> Result<GameCell, ParsingError> {
         BR => Ok(GameCellType::BR),
         Rule::horizontal => Ok(GameCellType::Horizontal),
         Rule::vertical => Ok(GameCellType::Vertical),
-        Rule::animal => Ok(GameCellType::Animal(None)),
+        Rule::animal => Ok(GameCellType::EmptyAnimal),
         _ => Err(InvalidData("Expected a cell type, couldn't find one"))
     }
 }
